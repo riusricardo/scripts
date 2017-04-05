@@ -34,6 +34,10 @@ RUN curl -O https://bootstrap.pypa.io/get-pip.py && \
 # install rustup
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 
+# setup rust beta channel
+RUN rustup update beta
+RUN rustup default beta
+
 # rustup directory
 ENV PATH /root/.cargo/bin:$PATH
 
