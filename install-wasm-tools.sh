@@ -19,7 +19,7 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
 		exit 1;
 	elif [ -f /etc/arch-release ]; then
 		echo "Arch Linux detected."
-		$MAKE_ME_ROOT pacman -Syu --needed --noconfirm curl jq tar cmake gcc clang
+		$MAKE_ME_ROOT pacman -Syu --needed --noconfirm curl cmake gcc clang wabt
 	elif [ -f /etc/mandrake-release ]; then
 		echo "Mandrake Linux detected."
 		echo "This OS is not supported with this script at present. Sorry."
@@ -45,7 +45,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
 	fi
 
 	brew update
-	brew install binaryen wabt curl cmake llvm
+	brew install wabt curl cmake llvm
 elif [[ "$OSTYPE" == "freebsd"* ]]; then
 	echo "FreeBSD detected."
 	echo "This OS is not supported with this script at present. Sorry."
@@ -76,7 +76,7 @@ echo "Installing wasm-prune into ~/.cargo/bin"
 cargo install pwasm-utils-cli --bin wasm-prune --force
 
 # Copy WASM binaries after successful rust/cargo install.
-if [[ "$OSTYPE" == "linux-gnu" ]]; then
+if [[ "$OSTYPE" == "linux-gnu" ]] && [ -f /etc/debian_version ]; then
 	set -e
 
 	BUILD_NUM=`curl -s https://storage.googleapis.com/wasm-llvm/builds/linux/lkgr.json | jq -r '.build'`
@@ -90,7 +90,7 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
 	echo "Downloading wasm-binaries.tbz2";
 	curl -L -o wasm-binaries.tbz2 https://storage.googleapis.com/wasm-llvm/builds/linux/$BUILD_NUM/wasm-binaries.tbz2
 
-	declare -a binaries=("wasm2wat" "wat2wasm" "wasm-opt") # Default binaries
+	declare -a binaries=("wasm2wat" "wat2wasm") # Default binaries
 	if [ "$#" -ne 0 ]; then
 		echo "Installing selected binaries.";
 		binaries=("$@");
